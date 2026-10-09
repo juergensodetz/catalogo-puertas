@@ -3,26 +3,131 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visor de Puerta 3D</title>
-  <!-- Script oficial de Google Model Viewer -->
+  <title>Configurador Interactivo de Puertas 3D</title>
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
   <style>
-    body { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background-color: #f5f5f5; }
-    model-viewer { width: 100%; height: 100%; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+    body { width: 100vw; height: 100vh; overflow: hidden; background: #1a1a1a; }
+    
+    /* Visor 3D */
+    model-viewer { width: 100%; height: 100%; --poster-color: transparent; }
+
+    /* Panel flotante de controles */
+    .controls-panel {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 480px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 16px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 10;
+    }
+
+    .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #666; letter-spacing: 0.5px; }
+    .options-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+    
+    /* Botones de modelos */
+    .btn-option {
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .btn-option.active { background: #007bff; color: white; border-color: #007bff; }
+
+    /* Paleta de colores para paredes/fondo */
+    .color-swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Botón AR destacado */
+    .ar-button {
+      background: linear-gradient(135deg, #28a745, #218838);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+    }
   </style>
 </head>
 <body>
 
-  <!-- Visor interactivo y botón de Realidad Aumentada -->
   <model-viewer 
-    src="puerta.glb" 
-    alt="Modelo 3D de Puerta" 
+    id="viewer"
+    src="puerta_clasica.glb" 
+    alt="Puerta 3D Interactiva" 
     ar 
     ar-modes="webxr scene-viewer quick-look" 
     camera-controls 
     auto-rotate 
-    shadow-intensity="1">
+    shadow-intensity="1.5"
+    shadow-softness="0.8"
+    exposure="1.0">
   </model-viewer>
+
+  <div class="controls-panel">
+    <!-- Selector de Modelos de Puertas -->
+    <div class="section-title">Modelo de Puerta</div>
+    <div class="options-row">
+      <button class="btn-option active" onclick="cambiarModelo('puerta_clasica.glb', this)">Clásica Madera</button>
+      <button class="btn-option" onclick="cambiarModelo('puerta_moderna.glb', this)">Moderna Minimalista</button>
+      <button class="btn-option" onclick="cambiarModelo('puerta_seguridad.glb', this)">Seguridad Blindada</button>
+    </div>
+
+    <!-- Selector de Tono de Entorno / Pared -->
+    <div class="section-title">Color de Ambiente / Pared</div>
+    <div class="options-row">
+      <div class="color-swatch" style="background: #f5f5f5;" onclick="cambiarFondo('#f5f5f5')"></div>
+      <div class="color-swatch" style="background: #e2d7c5;" onclick="cambiarFondo('#e2d7c5')"></div>
+      <div class="color-swatch" style="background: #4a5568;" onclick="cambiarFondo('#4a5568')"></div>
+      <div class="color-swatch" style="background: #2d3748;" onclick="cambiarFondo('#2d3748')"></div>
+    </div>
+
+    <!-- Botón de Realidad Aumentada -->
+    <button class="ar-button" onclick="document.getElementById('viewer').activateAR()">
+      📐 Proyectar Puerta en tu Pared (AR)
+    </button>
+  </div>
+
+  <script>
+    const viewer = document.getElementById('viewer');
+
+    // Función para cambiar de modelo de puerta
+    function cambiarModelo(archivo, elemento) {
+      viewer.src = archivo;
+      document.querySelectorAll('.btn-option').forEach(btn => btn.classList.remove('active'));
+      elemento.classList.add('active');
+    }
+
+    // Función para cambiar el tono del fondo/pared
+    function cambiarFondo(colorHex) {
+      document.body.style.backgroundColor = colorHex;
+    }
+  </script>
 
 </body>
 </html>
